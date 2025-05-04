@@ -21,14 +21,21 @@ func pthread_dispatch(_ code: @escaping () -> Void) {
     }, blockPointer)
 }
 
-enum EvilEnum {
-    case stayalive
-    case restart
+enum EvilEnum: Int {
+    case stayalive = 0
+    case restart = 2
 }
+
+let trollapps: [String] = [
+    "com.apple.Preferences",
+    "com.apple.mobilesafari",
+    "com.apple.MobileSMS"
+]
 
 func EvilWorkspace(mode: EvilEnum) {
     
     @AppStorage("isEvil") var isEvil: Bool = false
+    @AppStorage("stayalivev2") var stayalivev2: Bool = false
     
     pthread_dispatch {
         while true {
@@ -37,14 +44,22 @@ func EvilWorkspace(mode: EvilEnum) {
         }
     }
     
+    if stayalivev2 {
+        pthread_dispatch {
+            while true {
+                for app in trollapps {
+                    EvilOpen(app)
+                    if !isEvil, mode == .stayalive { return }
+                }
+            }
+        }
+    }
+    
     switch mode {
     case .restart:
         pthread_dispatch {
-            //
-            // IDK, why yet, but calling this from a background thread which makes this 100% reliable reincarnation method.
-            //
-            UIControl().sendAction(#selector(NSXPCConnection.suspend),
-                                           to: UIApplication.shared, for: nil)
+            Thread.sleep(forTimeInterval: 1.0)
+            exit(0)
         }
         break
     case .stayalive:

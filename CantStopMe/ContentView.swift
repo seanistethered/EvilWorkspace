@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("isEvil") var isEvil: Bool = false
+    @AppStorage("stayalivev2") var stayalivev2: Bool = false
     
     init() {
         EvilFind()
@@ -23,24 +24,38 @@ struct ContentView: View {
                 .foregroundColor(.red)
                 .font(.system(size: 40)) +
             Text("Workspace")
-                .foregroundColor(.white)
+                .foregroundColor(.primary)
                 .font(.system(size: 40))
             Spacer()
-            Button(isEvil ? "Dont be Evil" : "Be Evil") {
-                if !isEvil {
-                    EvilWorkspace(mode: .stayalive)
+            List {
+                Section(header: Text("Persistence"),
+                        footer: Text("This option makes ur phone even more unresposive than before! THIS IS A WARNING!")) {
+                    Toggle("Switcher Trolling", isOn: $stayalivev2)
                 }
-                isEvil = !isEvil
+                Section(footer: Text("Triggers the persistence exploit")) {
+                    Button(isEvil ? "Dont be Evil" : "Be Evil") {
+                        if !isEvil {
+                            EvilWorkspace(mode: .stayalive)
+                        }
+                        isEvil = !isEvil
+                    }
+                    .foregroundColor(isEvil ? .red : .blue)
+                }
+                Section(header: Text("App life cycle"),
+                        footer: Text("Restarts the app.")) {
+                    Button("Restart App") {
+                        EvilWorkspace(mode: .restart)
+                    }
+                    .disabled(isEvil)
+                }
             }
-            .foregroundColor(isEvil ? .red : .blue)
-            Spacer().frame(height: 50)
-            Button("Restart App") {
-                EvilWorkspace(mode: .restart)
-            }
-            .disabled(isEvil)
+            .cornerRadius(20)
             Spacer()
             Text("PID: \(String(getpid()))")
             Text("Discovered by.SeanIsTethered")
+            Section {
+                
+            }
         }
         .padding()
     }
